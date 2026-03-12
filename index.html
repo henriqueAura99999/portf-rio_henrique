@@ -1,114 +1,93 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Mini Parkour JS</title>
-    <style>
-        body { margin: 0; overflow: hidden; font-family: sans-serif; }
-        #ui { position: absolute; top: 10px; left: 10px; color: white; background: rgba(0,0,0,0.5); padding: 10px; }
-    </style>
-</head>
-<body>
-    <div id="ui">Use WASD para mover e ESPAÇO para pular!</div>
-    <script type="module">
-        import * as THREE from 'https://cdn.skypack.dev/three@0.136.0';
+import pygame
+import random
 
-        // --- Configuração da Cena ---
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x87ceeb);
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+# Inicialização do Pygame
+pygame.init()
 
-        // --- Luzes ---
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(5, 10, 5);
-        scene.add(light, new THREE.AmbientLight(0x404040));
+# Tela
+WIDTH, HEIGHT = 800, 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("SuperHero Royale")
 
-        // --- Jogador ---
-        const playerGeo = new THREE.BoxGeometry(1, 1, 1);
-        const playerMat = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-        const player = new THREE.Mesh(playerGeo, playerMat);
-        player.position.y = 1;
-        scene.add(player);
+# Cores
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+BLUE = (0, 0, 255)
+GREEN = (0, 255, 0)
+YELLOW = (255, 255, 0)
 
-        // --- Plataformas (O Parkour) ---
-        const platforms = [];
-        function createPlatform(x, y, z, w, d) {
-            const geo = new THREE.BoxGeometry(w, 0.5, d);
-            const mat = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
-            const plat = new THREE.Mesh(geo, mat);
-            plat.position.set(x, y, z);
-            scene.add(plat);
-            platforms.push(plat);
-        }
+# Classe Carta
+class Card:
+    def __init__(self, name, health, attack, speed, rarity, unlocked=False):
+        self.name = name
+        self.health = health
+        self.attack = attack
+        self.speed = speed
+        self.rarity = rarity
+        self.unlocked = unlocked
+        self.x = 0
+        self.y = HEIGHT // 2
+        self.alive = True
 
-        // Criando o percurso
-        createPlatform(0, 0, 0, 5, 5);     // Início
-        createPlatform(0, 1, -8, 3, 3);    // Salto 1
-        createPlatform(5, 2, -15, 2, 2);   // Salto 2
-        createPlatform(-2, 4, -22, 3, 3);  // Salto 3
+    def move(self):
+        self.x += self.speed
 
-        // --- Lógica de Movimento ---
-        let keys = {};
-        let velocityY = 0;
-        let isGrounded = false;
-        const speed = 0.1;
-        const gravity = 0.01;
+    def draw(self, screen):
+        color = WHITE
+        if self.rarity == "Comum":
+            color = GREEN
+        elif self.rarity == "Incomum":
+            color = BLUE
+        elif self.rarity == "Raro":
+            color = YELLOW
+        elif self.rarity == "Lendário":
+            color = RED
 
-        window.addEventListener('keydown', (e) => keys[e.code] = true);
-        window.addEventListener('keyup', (e) => keys[e.code] = false);
+        pygame.draw.rect(screen, color, (self.x, self.y, 60, 60))
+        font = pygame.font.SysFont(None, 24)
+        text = font.render(self.name, True, BLACK)
+        screen.blit(text, (self.x, self.y - 20))
 
-        function update() {
-            // Movimento Horizontal
-            if (keys['KeyW']) player.position.z -= speed;
-            if (keys['KeyS']) player.position.z += speed;
-            if (keys['KeyA']) player.position.x -= speed;
-            if (keys['KeyD']) player.position.x += speed;
+# Cartas do jogo
+cards = [
+    Card("Sukuna", 120, 30, 3, "Lendário"),
+    Card("Gojo", 100, 25, 4, "Raro"),
+    Card("Yuji Itadori", 90, 20, 5, "Incomum"),
+    Card("Saitama", 150, 35, 2, "Lendário"),
+    Card("Garou", 110, 28, 3, "Raro")
+]
 
-            // Gravidade e Pulo
-            velocityY -= gravity;
-            player.position.y += velocityY;
+# Função para desbloquear cartas com código
+def unlock_card(code):
+    if code == "EZ":
+        for card in cards:
+            card.unlocked = True
+        print("Código correto! Todas as cartas desbloqueadas!")
+    else:
+        print("Código inválido.")
 
-            // Colisão Simples (Chão/Plataformas)
-            isGrounded = false;
-            platforms.forEach(p => {
-                const dx = Math.abs(player.position.x - p.position.x);
-                const dz = Math.abs(player.position.z - p.position.z);
-                
-                // Se estiver sobre a plataforma
-                if (dx < (p.geometry.parameters.width/2 + 0.5) && 
-                    dz < (p.geometry.parameters.depth/2 + 0.5)) {
-                    if (player.position.y > p.position.y && player.position.y < p.position.y + 1) {
-                        player.position.y = p.position.y + 0.75;
-                        velocityY = 0;
-                        isGrounded = true;
-                    }
-                }
-            });
+# Exemplo: desbloqueando cartas
+unlock_card("EZ")  # Tente mudar para testar código inválido
 
-            if (keys['Space'] && isGrounded) {
-                velocityY = 0.2;
-            }
+# Loop principal
+running = True
+clock = pygame.time.Clock()
 
-            // Reset se cair
-            if (player.position.y < -10) {
-                player.position.set(0, 5, 0);
-                velocityY = 0;
-            }
+while running:
+    clock.tick(60)
+    screen.fill(WHITE)
 
-            // Câmera segue o jogador
-            camera.position.set(player.position.x, player.position.y + 5, player.position.z + 10);
-            camera.lookAt(player.position);
-        }
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-        function animate() {
-            requestAnimationFrame(animate);
-            update();
-            renderer.render(scene, camera);
-        }
-        animate();
-    </script>
-</body>
-</html>
+    # Movimenta e desenha cartas desbloqueadas
+    for card in cards:
+        if card.unlocked and card.alive:
+            card.move()
+            card.draw(screen)
+
+    pygame.display.flip()
+
+pygame.quit()
