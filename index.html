@@ -1,93 +1,73 @@
-import pygame
-import random
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venda Xit Free Frifre</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Xit Free Frifre</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#home">Início</a></li>
+                <li><a href="#produtos">Produtos</a></li>
+                <li><a href="#sobre">Sobre</a></li>
+                <li><a href="#contato">Contato</a></li>
+            </ul>
+        </nav>
+    </header>
 
-# Inicialização do Pygame
-pygame.init()
+    <section id="home">
+        <h2>Bem-vindo à nossa loja!</h2>
+        <p>Produtos deliciosos e 100% sem glúten e sem aditivos químicos!</p>
+    </section>
 
-# Tela
-WIDTH, HEIGHT = 800, 600
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("SuperHero Royale")
+    <section id="produtos">
+        <h2>Nossos Produtos</h2>
+        <div class="produtos">
+            <div class="produto">
+                <img src="produto1.jpg" alt="Produto 1">
+                <h3>Produto 1</h3>
+                <p>Descrição do produto 1.</p>
+                <button class="btn-comprar" onclick="adicionarCarrinho('Produto 1')">Comprar</button>
+            </div>
+            <div class="produto">
+                <img src="produto2.jpg" alt="Produto 2">
+                <h3>Produto 2</h3>
+                <p>Descrição do produto 2.</p>
+                <button class="btn-comprar" onclick="adicionarCarrinho('Produto 2')">Comprar</button>
+            </div>
+        </div>
+    </section>
 
-# Cores
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
-GREEN = (0, 255, 0)
-YELLOW = (255, 255, 0)
+    <section id="sobre">
+        <h2>Sobre nós</h2>
+        <p>Somos uma empresa comprometida em oferecer produtos livres de glúten e saudáveis para todos.</p>
+    </section>
 
-# Classe Carta
-class Card:
-    def __init__(self, name, health, attack, speed, rarity, unlocked=False):
-        self.name = name
-        self.health = health
-        self.attack = attack
-        self.speed = speed
-        self.rarity = rarity
-        self.unlocked = unlocked
-        self.x = 0
-        self.y = HEIGHT // 2
-        self.alive = True
+    <section id="contato">
+        <h2>Contato</h2>
+        <form>
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" required>
 
-    def move(self):
-        self.x += self.speed
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" name="email" required>
 
-    def draw(self, screen):
-        color = WHITE
-        if self.rarity == "Comum":
-            color = GREEN
-        elif self.rarity == "Incomum":
-            color = BLUE
-        elif self.rarity == "Raro":
-            color = YELLOW
-        elif self.rarity == "Lendário":
-            color = RED
+            <textarea id="mensagem" name="mensagem" placeholder="Sua mensagem..." required></textarea>
 
-        pygame.draw.rect(screen, color, (self.x, self.y, 60, 60))
-        font = pygame.font.SysFont(None, 24)
-        text = font.render(self.name, True, BLACK)
-        screen.blit(text, (self.x, self.y - 20))
+            <button type="submit">Enviar</button>
+        </form>
+    </section>
 
-# Cartas do jogo
-cards = [
-    Card("Sukuna", 120, 30, 3, "Lendário"),
-    Card("Gojo", 100, 25, 4, "Raro"),
-    Card("Yuji Itadori", 90, 20, 5, "Incomum"),
-    Card("Saitama", 150, 35, 2, "Lendário"),
-    Card("Garou", 110, 28, 3, "Raro")
-]
+    <footer>
+        <p>&copy; 2026 Xit Free Frifre - Todos os direitos reservados</p>
+    </footer>
 
-# Função para desbloquear cartas com código
-def unlock_card(code):
-    if code == "EZ":
-        for card in cards:
-            card.unlocked = True
-        print("Código correto! Todas as cartas desbloqueadas!")
-    else:
-        print("Código inválido.")
-
-# Exemplo: desbloqueando cartas
-unlock_card("EZ")  # Tente mudar para testar código inválido
-
-# Loop principal
-running = True
-clock = pygame.time.Clock()
-
-while running:
-    clock.tick(60)
-    screen.fill(WHITE)
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-    # Movimenta e desenha cartas desbloqueadas
-    for card in cards:
-        if card.unlocked and card.alive:
-            card.move()
-            card.draw(screen)
-
-    pygame.display.flip()
-
-pygame.quit()
+    <script src="scripts.js"></script>
+</body>
+</html>
